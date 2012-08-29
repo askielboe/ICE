@@ -1,18 +1,19 @@
 # 
-# File:    create_database.py 
+# File:    load_data.py 
 # 
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
 # 
 # Summary of File: 
 # 
-#   Loads data from SDSS into classes and writes the classes to the database
+#   Loads raw data from SDSS and Redmapepr into classes
+#   and writes the classes to the database.
 # 
 
 #--------------------------------------------------------------------------------
 # Settings
 #--------------------------------------------------------------------------------
-maxNumberOfBcgs = 10
+maxNumberOfBcgs = 100
 maxNumberOfGalaxies = 10000
 
 #--------------------------------------------------------------------------------
@@ -49,11 +50,12 @@ for MEM_MATCH_ID,RA,DEC,MODEL_MAG,MODEL_MAGERR,IMAG,IMAG_ERR,ZRED,ZRED_E,BCG_SPE
 	
 	if (BCG_SPEC_Z == -1.): break
 	
-	bcg = Bcg(-1.0, RA, DEC, BCG_SPEC_Z)
+	bcg = Bcg(RA, DEC, BCG_SPEC_Z)
 	bcg.pBCG = P_BCG
 	bcg.richness = Z_LAMBDA_E
 	
 	session.add(bcg)
+	
 	counter += 1
 	if (counter == maxNumberOfBcgs): break
 	if (counter % 100 == 0):
@@ -63,7 +65,8 @@ for MEM_MATCH_ID,RA,DEC,MODEL_MAG,MODEL_MAGERR,IMAG,IMAG_ERR,ZRED,ZRED_E,BCG_SPE
 counter = 0
 
 for objID, ra, dec, z, zErr, deVAB_r, deVABErr_r, deVPhi_r, lnLDeV_r in dataSDSSGalaxies:
-	galaxy = Galaxy(objID, ra, dec, z)
+	galaxy = Galaxy(ra, dec, z)
+	galaxy.objID = objID
 	galaxy.zErr = zErr
 	galaxy.deVAB_r = deVAB_r
 	galaxy.deVABErr_r = deVABErr_r
@@ -71,6 +74,7 @@ for objID, ra, dec, z, zErr, deVAB_r, deVABErr_r, deVPhi_r, lnLDeV_r in dataSDSS
 	galaxy.lnLDeV_r = lnLDeV_r
 	
 	session.add(galaxy)
+	
 	counter += 1
 	if (counter == maxNumberOfGalaxies): break
 	if (counter % 1000 == 0):

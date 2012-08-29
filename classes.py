@@ -32,29 +32,18 @@ class Bcg(Base):
 	__tablename__ = 'bcgs'
 	
 	id = Column(Integer, primary_key=True)
-	
-	# SDSS Quantities
 	galaxy_id     = Column(Integer, ForeignKey('galaxies.id'))		# Corresponding Galaxy ID
+	
+	# Redmapper Quantities
 	ra            = Column(Float)		# Right ascension
 	dec           = Column(Float)		# Declination
 	z             = Column(Float)		# Redshift
-	zErr          = Column(Float)		# Redshift Error
-	deVAB_r       = Column(Float)		# Axis Ratio (de Vaucouleurs fit)
-	deVABErr_r    = Column(Float)		# Axis Ratio Error (de Vaucouleurs fit)
-	deVPhi_r      = Column(Float)		# Position Angle (de Vaucouleurs fit)
-	lnLDeV_r      = Column(Float)		# de Vaucouleurs fit likelihood
-	
-	# Derived quantities
-	da            = Column(Float)		# Angular Diameter Distance
-	
-	# Cluster catalog quantities
 	pBCG          = Column(Float)		# pBCG (redmapper: Rozo et. al. 2012)
 	richness      = Column(Float)		# Richness
 	
 	galaxies = relationship("Association", backref='bcgs')
 	
-	def __init__(self, objID, ra, dec, z):
-		self.objID = objID
+	def __init__(self, ra, dec, z):
 		self.ra = ra
 		self.dec = dec
 		self.z = z
@@ -92,11 +81,12 @@ class Galaxy(Base):
 	# Derived quantities
 	da            = Column(Float)		# Angular Diameter Distance
 	
-	def __init__(self, objID, ra, dec, z):
-		self.objID = objID
+	def __init__(self, ra, dec, z):
 		self.ra = ra
 		self.dec = dec
 		self.z = z
+		
+		self.objID = -1.0
 		
 		self.zErr = -1.0
 		self.deVAB_r = -1.0
