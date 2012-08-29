@@ -13,7 +13,7 @@
 #--------------------------------------------------------------------------------
 # Settings
 #--------------------------------------------------------------------------------
-maxNumberOfBcgs = 100
+maxNumberOfBcgs = 1000
 maxNumberOfGalaxies = 10000
 
 #--------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ from classes import Bcg, Galaxy
 counter = 0
 for MEM_MATCH_ID,RA,DEC,MODEL_MAG,MODEL_MAGERR,IMAG,IMAG_ERR,ZRED,ZRED_E,BCG_SPEC_Z,Z_SPEC_INIT,Z_INIT,Z,LAMBDA_CHISQ,LAMBDA_CHISQ_E,SCALEVAL,MASKFRAC,C_LAMBDA,C_LAMBDA_ERR,Z_LAMBDA,Z_LAMBDA_E,LNLAMLIKE,LNBCGLIKE,LNLIKE,RA_ORIG,DEC_ORIG,P_BCG in dataRedmapperCGs:
 	
-	if (BCG_SPEC_Z == -1.): break
+	if (BCG_SPEC_Z == -1.): continue
 	
 	bcg = Bcg(RA, DEC, BCG_SPEC_Z)
 	bcg.pBCG = P_BCG
