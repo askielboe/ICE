@@ -29,17 +29,14 @@ from classes import Bcg, Galaxy, Association
 import math
 from sqlalchemy import func
 
-queryBcgDa = session.query(Bcg.id, Galaxy.da).filter(Bcg.sdss_galaxy_id == Galaxy.id).subquery('queryBcgDa')
+#queryBcgDa = session.query(Bcg.id, Galaxy.da).filter(Bcg.sdss_galaxy_id == Galaxy.id).subquery('queryBcgDa')
 #queryGalaxyNotBcg = session.query(Galaxy).join(Bcg).filter(Galaxy.id != Bcg.sdss_galaxy_id).subquery('queryGalaxyNotBcg')
 
 counter = 0
-q = session.query(Galaxy, Bcg, queryBcgDa.c.da)
+q = session.query(Galaxy, Bcg)
 
 # Don't add BCGs to BCGs
-q = q.filter(Galaxy.id != Bcg.sdss_galaxy_id)
-
-# Only use BCGs that have been matched to a galaxy in SDSS
-q = q.filter(Bcg.id == queryBcgDa.c.id)
+#q = q.filter(Galaxy.id != Bcg.sdss_galaxy_id)
 
 # Do rough cut on position
 q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < 1.135)
@@ -48,16 +45,17 @@ q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < 1.135)
 q = q.filter(func.abs(calcVrel(Bcg.z, Galaxy.z)) < maxVrel)
 
 # Do cut on projected separation
-q = q.filter(calcSQLDist(Bcg.ra, Bcg.dec, Galaxy.ra, Galaxy.dec) < func.asin( maxComovingDistance / queryBcgDa.c.da ))
+q = q.filter(calcSQLDist(Bcg.ra, Bcg.dec, Galaxy.ra, Galaxy.dec) < func.asin( maxComovingDistance / Bcg.da ))
 
-for galaxy, bcg, da in q.all():
+for galaxy, bcg in q.all():
 	# If the BCG-galaxy pair passes selection apertures then we add an association
 	vrel = calcVrel(bcg.z, galaxy.z)
 	sep = calcDist(bcg.ra, bcg.dec, galaxy.ra, galaxy.dec)
-	dist = math.tan(sep) * da
+	dist = math.tan(sep) * bcg.da
 	
 	association = Association(dist=dist, vrel=vrel)
 	association.galaxy = galaxy
+	#association.positionAngle = 
 	bcg.associated_galaxies.append(association)
 	
 	#print galaxy, " added to ", bcg
