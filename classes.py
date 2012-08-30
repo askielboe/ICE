@@ -32,7 +32,9 @@ class Bcg(Base):
 	__tablename__ = 'bcgs'
 	
 	id = Column(Integer, primary_key=True)
-	galaxy_id     = Column(Integer, ForeignKey('galaxies.id'))		# Corresponding Galaxy ID
+	
+	sdss_galaxy_id = Column(Integer, ForeignKey('galaxies.id'))		# Corresponding Galaxy ID
+	sdss_galaxy    = relationship("Galaxy", uselist=False, backref="matched_bcg")
 	
 	# Redmapper Quantities
 	ra            = Column(Float)		# Right ascension
@@ -41,7 +43,10 @@ class Bcg(Base):
 	pBCG          = Column(Float)		# pBCG (redmapper: Rozo et. al. 2012)
 	richness      = Column(Float)		# Richness
 	
-	galaxies = relationship("Association", backref='bcgs')
+	# Derived quantities
+	da            = Column(Float)		# Angular Diameter Distance
+	
+	associated_galaxies = relationship("Association", backref='bcg')
 	
 	def __init__(self, ra, dec, z):
 		self.ra = ra
@@ -58,7 +63,7 @@ class Bcg(Base):
 		self.richness = -1.0
 		
 		self.da = -1.0
-
+	
 	def __repr__(self):
 		return "<Bcg('%f','%f','%f')>" % (self.ra, self.dec, self.z)
 

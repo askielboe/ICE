@@ -22,49 +22,43 @@ from database_operations import create_session
 session = create_session()
 
 #--------------------------------------------------------------------------------
-# Define (physics) functions (move to seperate file?)
-#--------------------------------------------------------------------------------
-def calcSQLDist(ra1, dec1, ra2, dec2):
-	from sqlalchemy import func
-	from math import pi
-	return func.acos(func.sin(dec1*pi/180.0)*func.sin(dec2*pi/180.0) + func.cos(dec1*pi/180.0)*func.cos(dec2*pi/180.0)*func.cos((ra1-ra2)*pi/180.0))
-
-def calcDist(ra1, dec1, ra2, dec2):
-	from math import pi, cos, sin, acos
-	try:
-		return acos(sin(dec1*pi/180.0)*sin(dec2*pi/180.0) + cos(dec1*pi/180.0)*cos(dec2*pi/180.0)*cos((ra1-ra2)*pi/180.0))
-	except ValueError:
-		return -1.0
-
-def calcSQLSimpleDist(ra1, dec1, ra2, dec2):
-	from sqlalchemy import func
-	return func.abs(dec1 - dec2) + func.abs(ra1 - ra2)
-
-def calcVrel(z1, z2):
-	SPEED_OF_LIGHT = 299792.0 # km/s
-	return SPEED_OF_LIGHT * ((1. + z1) / (1. + z2) - 1.)
-
-#--------------------------------------------------------------------------------
 # Assign galaxies to clusters
 #--------------------------------------------------------------------------------
-from sqlalchemy import func
-import math
+from physics import calcSQLSumDist, calcSQLDist, calcVrel, calcDist
 from classes import Bcg, Galaxy, Association
+import math
+from sqlalchemy import func
+
+queryBcgDa = session.query(Bcg.id, Galaxy.da).filter(Bcg.sdss_galaxy_id == Galaxy.id).subquery('queryBcgDa')
+#queryGalaxyNotBcg = session.query(Galaxy).join(Bcg).filter(Galaxy.id != Bcg.sdss_galaxy_id).subquery('queryGalaxyNotBcg')
 
 counter = 0
-for bcg, galaxy in session.query(Bcg,Galaxy).\
-filter(calcSQLSimpleDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < 1.135).\
-filter(func.abs(calcVrel(Bcg.z, Galaxy.z)) < maxVrel).\
-filter(calcSQLDist(Bcg.ra, Bcg.dec, Galaxy.ra, Galaxy.dec) < func.asin( maxComovingDistance / Bcg.da )).\
-all():
+q = session.query(Galaxy, Bcg, queryBcgDa.c.da)
+
+# Don't add BCGs to BCGs
+q = q.filter(Galaxy.id != Bcg.sdss_galaxy_id)
+
+# Only use BCGs that have been matched to a galaxy in SDSS
+q = q.filter(Bcg.id == queryBcgDa.c.id)
+
+# Do rough cut on position
+q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < 1.135)
+
+# Do cut on relative velocity
+q = q.filter(func.abs(calcVrel(Bcg.z, Galaxy.z)) < maxVrel)
+
+# Do cut on projected separation
+q = q.filter(calcSQLDist(Bcg.ra, Bcg.dec, Galaxy.ra, Galaxy.dec) < func.asin( maxComovingDistance / queryBcgDa.c.da ))
+
+for galaxy, bcg, da in q.all():
 	# If the BCG-galaxy pair passes selection apertures then we add an association
 	vrel = calcVrel(bcg.z, galaxy.z)
 	sep = calcDist(bcg.ra, bcg.dec, galaxy.ra, galaxy.dec)
-	dist = math.tan(sep) * bcg.da
+	dist = math.tan(sep) * da
 	
 	association = Association(dist=dist, vrel=vrel)
 	association.galaxy = galaxy
-	bcg.galaxies.append(association)
+	bcg.associated_galaxies.append(association)
 	
 	#print galaxy, " added to ", bcg
 	
