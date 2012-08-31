@@ -21,20 +21,20 @@ maxZDiff = 0.0001
 from database_operations import create_session
 session = create_session()
 
-#--------------------------------------------------------------------------------
-# Match BCGs with galaxies from SDSS
-#--------------------------------------------------------------------------------
-from physics import calcSQLSumDist
-from classes import Bcg, Galaxy
-from sqlalchemy import func
-
-counter = 0
-q = session.query(Bcg, Galaxy)
-# Do rough cut on position
-q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < maxSumDist)
-# Do cut on redshift difference
-q = q.filter(func.abs(Bcg.z - Galaxy.z) < maxZDiff)
-
+# #--------------------------------------------------------------------------------
+# # Match BCGs with galaxies from SDSS
+# #--------------------------------------------------------------------------------
+# from physics import calcSQLSumDist
+# from classes import Bcg, Galaxy
+# from sqlalchemy import func
+# 
+# counter = 0
+# q = session.query(Bcg, Galaxy)
+# # Do rough cut on position
+# q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < maxSumDist)
+# # Do cut on redshift difference
+# q = q.filter(func.abs(Bcg.z - Galaxy.z) < maxZDiff)
+# 
 # while (len(q.all()) > 1):
 # 	print "WARNING: Found several matches! Trying with tighter cuts.."
 # 	print "len(q.all()) = ", len(q.all())
@@ -45,11 +45,24 @@ q = q.filter(func.abs(Bcg.z - Galaxy.z) < maxZDiff)
 # 	q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < maxSumDist)
 # 	# Do cut on redshift difference
 # 	q = q.filter(func.abs(Bcg.z - Galaxy.z) < maxZDiff)
+# 
+# for bcg, galaxy in q.all():	
+# 	bcg.sdss_galaxy = galaxy
+# 	counter += 1
+# 
+# session.commit()
+# 
+# print "Total number of BCGs matched to SDSS galaxies = ", counter
 
-for bcg, galaxy in q.all():	
+#--------------------------------------------------------------------------------
+# Match objects using associations
+#--------------------------------------------------------------------------------
+from classes import Association, Galaxy, Bcg
+q = session.query(Association)
+q = q.filter(Association.dist < 0.0001)
+q = q.filter(Association.vrel < 1.0)
+
+for galaxy, bcg in [(a.galaxy, a.bcg) for a in q.all()]:
 	bcg.sdss_galaxy = galaxy
-	counter += 1
 
 session.commit()
-
-print "Total number of BCGs matched to SDSS galaxies = ", counter
