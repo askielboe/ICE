@@ -109,3 +109,6 @@ def cosmocalc_angular_diameter_distance(z):
 	DA_Mpc = (c/H0)*DA
 	
 	return DA_Mpc
+
+def calcAngleToBCGMajorAxis():
+	return -1.0
