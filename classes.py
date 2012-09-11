@@ -24,7 +24,8 @@ class Association(Base):
 	
 	dist = Column(Float)		# Projected distance to BCG in Mpc
 	vrel = Column(Float)		# Velocity relative to BCG in km/s
-	positionAngle = Column(Float)		# Galaxy position angle in galaxy cluster
+	positionAngle = Column(Float)		# Galaxy position angle East of North with respect to the BCG position
+	angleToBCGMajorAxis = Column(Float)
 	
 	galaxy = relationship("Galaxy")
 
@@ -43,6 +44,13 @@ class Bcg(Base):
 	pBCG          = Column(Float)		# pBCG (redmapper: Rozo et. al. 2012)
 	richness      = Column(Float)		# Richness
 	
+	# SDSS Quantities
+	objID         = Column(BigInteger)	# SDSS Object ID
+	deVAB_r       = Column(Float)		# Axis Ratio (de Vaucouleurs fit)
+	deVABErr_r    = Column(Float)		# Axis Ratio Error (de Vaucouleurs fit)
+	deVPhi_r      = Column(Float)		# Position Angle (de Vaucouleurs fit)
+	lnLDeV_r      = Column(Float)		# de Vaucouleurs fit likelihood
+	
 	# Derived quantities
 	da            = Column(Float)		# Angular Diameter Distance
 	
@@ -53,7 +61,7 @@ class Bcg(Base):
 		self.dec = dec
 		self.z = z
 		
-		self.zErr = -1.0
+		self.objID = -1.0
 		self.deVAB_r = -1.0
 		self.deVABErr_r = -1.0
 		self.deVPhi_r = -1.0

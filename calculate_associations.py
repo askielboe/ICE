@@ -24,7 +24,7 @@ session = create_session()
 #--------------------------------------------------------------------------------
 # Assign galaxies to clusters
 #--------------------------------------------------------------------------------
-from physics import calcSQLSumDist, calcSQLDist, calcVrel, calcDist
+from physics import calcSQLSumDist, calcSQLDist, calcVrel, calcAngularSeparation
 from classes import Bcg, Galaxy, Association
 import math
 from sqlalchemy import func
@@ -34,9 +34,6 @@ from sqlalchemy import func
 
 counter = 0
 q = session.query(Galaxy, Bcg)
-
-# Don't add BCGs to BCGs
-#q = q.filter(Galaxy.id != Bcg.sdss_galaxy_id)
 
 # Do rough cut on position
 q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < 1.135)
@@ -50,12 +47,13 @@ q = q.filter(calcSQLDist(Bcg.ra, Bcg.dec, Galaxy.ra, Galaxy.dec) < func.asin( ma
 for galaxy, bcg in q.all():
 	# If the BCG-galaxy pair passes selection apertures then we add an association
 	vrel = calcVrel(bcg.z, galaxy.z)
-	sep = calcDist(bcg.ra, bcg.dec, galaxy.ra, galaxy.dec)
+	sep = calcAngularSeparation(bcg.ra, bcg.dec, galaxy.ra, galaxy.dec)
 	dist = math.tan(sep) * bcg.da
 	
 	association = Association(dist=dist, vrel=vrel)
 	association.galaxy = galaxy
-	#association.positionAngle = 
+	from functions import calcPositionAngleEofNRelativeToCenterInDegrees
+	association.positionAngle = calcPositionAngleEofNRelativeToCenterInDegrees([galaxy.ra,galaxy.dec],[bcg.ra,bcg.dec])
 	bcg.associated_galaxies.append(association)
 	
 	#print galaxy, " added to ", bcg

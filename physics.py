@@ -14,7 +14,7 @@ def calcSQLDist(ra1, dec1, ra2, dec2):
 	from math import pi
 	return func.acos(func.sin(dec1*pi/180.0)*func.sin(dec2*pi/180.0) + func.cos(dec1*pi/180.0)*func.cos(dec2*pi/180.0)*func.cos((ra1-ra2)*pi/180.0))
 
-def calcDist(ra1, dec1, ra2, dec2):
+def calcAngularSeparation(ra1, dec1, ra2, dec2):
 	from math import pi, cos, sin, acos
 	try:
 		return acos(sin(dec1*pi/180.0)*sin(dec2*pi/180.0) + cos(dec1*pi/180.0)*cos(dec2*pi/180.0)*cos((ra1-ra2)*pi/180.0))
@@ -28,6 +28,9 @@ def calcSQLSumDist(ra1, dec1, ra2, dec2):
 def calcVrel(z1, z2):
 	SPEED_OF_LIGHT = 299792.0 # km/s
 	return SPEED_OF_LIGHT * ((1. + z1) / (1. + z2) - 1.)
+
+def calcPositionAngleCartesianApproximation(ra1, dec1, ra2, dec2):
+	return -1.0
 
 def calc_angular_diameter_distance_noradiation(z):
 	# Function to calculate the proper distance (in Mpc) in a concordance cosmology
