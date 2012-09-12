@@ -23,7 +23,7 @@ def vecSub(vec1,vec2):
 		print "ERROR in vecSub: Type error!"
 		return
 
-def calcShortestAngleToYAxisInRadians(vec):
+def calcShortestAngleToYAxisInRadiansCartesian(vec):
 	from math import sqrt,pow,acos
 	if len(vec) != 2:
 		print "ERROR in calcShortestAngleToYAxisInRadians: Vector not of dimension 2!"
@@ -36,7 +36,8 @@ def calcShortestAngleToYAxisInRadians(vec):
 		print "ERROR in calcShortestAngleToYAxisInRadians: Type error!"
 		return
 
-def calcPositionAngleEofNRelativeToCenterInDegrees(vec,center):
+def calcPositionAngleEofNRelativeToCenterInDegreesCartesian(vec,center):
+	###### BROKEN ######
 	from math import pi
 	if len(vec) != 2:
 		print "ERROR in calcPositionAngleEofNRelativeToCenterInDegrees: Vector not of dimension 2!"
@@ -45,7 +46,7 @@ def calcPositionAngleEofNRelativeToCenterInDegrees(vec,center):
 		relativeVec = vecSub(vec,center)
 		if relativeVec[0] == relativeVec[1] == 0.:
 			return -1.
-		shortestAngleToY = calcShortestAngleToYAxisInRadians(relativeVec)
+		shortestAngleToY = calcShortestAngleToYAxisInRadiansCartesian(relativeVec)
 		# If vector is in 1st or 4th quadrant
 		if relativeVec[0] > 0.:
 			shortestAngleToY = 2. * pi - shortestAngleToY
@@ -54,13 +55,48 @@ def calcPositionAngleEofNRelativeToCenterInDegrees(vec,center):
 		print "ERROR in calcPositionAngleEofNRelativeToCenterInDegrees: Type error!"
 		return
 
+def calcPositionAngleEofNRelativeToCenterInDegreesSpherical(vec,center):
+	from math import pi, cos, sin, acos
+	from physics import calcAngularSeparation
+	if len(vec) != 2:
+		print "ERROR in calcPositionAngleEofNRelativeToCenterInDegrees: Vector not of dimension 2!"
+		return
+	try:
+		if (vec == center):
+			return None
+		
+		if (vec[0] == center[0]):
+			return 90.0
+		
+		if (vec[1] == center[1]):
+			return 0.0
+		
+		# Convert coordinates to radians and calculate relative to zenith
+		a = (90.0 - vec[1]) * pi/180.
+		b = (90.0 - center[1]) * pi/180.
+		
+		# c is the angular separation
+		c = calcAngularSeparation(vec[0],vec[1],center[0],center[1])
+		
+		# Using spherical law of cosines to calculate the angle A
+		cosAngleA = ( cos(a) - cos(c)*cos(b) ) / ( sin(c)*sin(b) )
+		
+		angleA = acos(cosAngleA)
+		positionAngle = angleA * 180./pi
+		
+		return positionAngle
+	except ValueError:
+		print "ERROR in calcPositionAngleEofNRelativeToCenterInDegrees: Type error!"
+		print "BCG position = ", center
+		print "Galaxy position = ", vec
+		print "Position difference = [", center[0]-vec[0], ", ", center[1]-vec[1], "]"
+		return
+
 def calcSmallestAngleBetweenBCGAndAgalaxy(positionAngleBCG,positionAngleGalaxy):
 	try:
 		angleDifference = abs(positionAngleBCG-positionAngleGalaxy)
-		if angleDifference > 180.:
-			angleDifference -= 180.
 		if angleDifference > 90.:
-			angleDifference -= 90.
+			angleDifference = 180. - angleDifference
 		return angleDifference
 	except ValueError:
 		print "ERROR in calcSmallestAngleBetweenVectorAndLine: Type error!"

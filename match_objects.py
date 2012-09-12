@@ -58,9 +58,10 @@ session = create_session()
 # Match objects using associations
 #--------------------------------------------------------------------------------
 from classes import Association
+from sqlalchemy import func
 q = session.query(Association)
 q = q.filter(Association.dist < 0.0001)
-q = q.filter(Association.vrel < 1.0)
+q = q.filter(func.abs(Association.vrel) < 50.0)
 
 for galaxy, bcg in [(a.galaxy, a.bcg) for a in q.all()]:
 	bcg.sdss_galaxy = galaxy

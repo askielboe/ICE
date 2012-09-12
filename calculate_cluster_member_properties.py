@@ -20,7 +20,12 @@ from functions import calcSmallestAngleBetweenBCGAndAgalaxy
 
 q = session.query(Association).filter(Association.positionAngle > -1)
 
+counter = 0
 for association in q.all():
 	association.angleToBCGMajorAxis = calcSmallestAngleBetweenBCGAndAgalaxy(association.positionAngle,association.bcg.deVPhi_r)
+	counter += 1
+	if (counter % 1000 == 0):
+		print counter , " # - calculating cluster member properties..."
+		session.commit()
 
 session.commit()
