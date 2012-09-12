@@ -16,10 +16,12 @@ def calcSQLDist(ra1, dec1, ra2, dec2):
 
 def calcAngularSeparation(ra1, dec1, ra2, dec2):
 	from math import pi, cos, sin, acos
+	if (ra1 == ra2 and dec1 == dec2):
+		return 0.0
 	try:
 		return acos(sin(dec1*pi/180.0)*sin(dec2*pi/180.0) + cos(dec1*pi/180.0)*cos(dec2*pi/180.0)*cos((ra1-ra2)*pi/180.0))
 	except ValueError:
-		return -1.0
+		return 0.0
 
 def calcSQLSumDist(ra1, dec1, ra2, dec2):
 	from sqlalchemy import func
