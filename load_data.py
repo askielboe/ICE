@@ -44,28 +44,28 @@ dataRedmapperCGs = inFileRedmapper[1].data
 #--------------------------------------------------------------------------------
 # Declare classes and commit them to database
 #--------------------------------------------------------------------------------
-from classes import Bcg, Galaxy
+from classes import Redmapper, SDSSGalaxy
 counter = 0
 for MEM_MATCH_ID,RA,DEC,MODEL_MAG,MODEL_MAGERR,IMAG,IMAG_ERR,ZRED,ZRED_E,BCG_SPEC_Z,Z_SPEC_INIT,Z_INIT,Z,LAMBDA_CHISQ,LAMBDA_CHISQ_E,SCALEVAL,MASKFRAC,C_LAMBDA,C_LAMBDA_ERR,Z_LAMBDA,Z_LAMBDA_E,LNLAMLIKE,LNBCGLIKE,LNLIKE,RA_ORIG,DEC_ORIG,P_BCG in dataRedmapperCGs:
 	
 	if (BCG_SPEC_Z == -1.): continue
 	
-	bcg = Bcg(RA, DEC, BCG_SPEC_Z)
+	bcg = Redmapper(RA, DEC, BCG_SPEC_Z)
+	bcg.mem_match_id = MEM_MATCH_ID
 	bcg.pBCG = P_BCG
-	bcg.richness = Z_LAMBDA_E
-	
+	bcg.lambda_chisq = LAMBDA_CHISQ
 	session.add(bcg)
 	
 	counter += 1
 	if (counter == maxNumberOfBcgs): break
 	if (counter % 100 == 0):
-		print counter , " # - comitting bcgs to database..."
+		print(counter , " # - comitting bcgs to database...")
 		session.commit()
 
 counter = 0
 
 for objID, ra, dec, z, zErr, deVAB_r, deVABErr_r, deVPhi_r, lnLDeV_r in dataSDSSGalaxies:
-	galaxy = Galaxy(ra, dec, z)
+	galaxy = SDSSGalaxy(ra, dec, z)
 	galaxy.objID = objID
 	galaxy.zErr = zErr
 	galaxy.deVAB_r = deVAB_r
@@ -78,7 +78,7 @@ for objID, ra, dec, z, zErr, deVAB_r, deVABErr_r, deVPhi_r, lnLDeV_r in dataSDSS
 	counter += 1
 	if (counter == maxNumberOfGalaxies): break
 	if (counter % 1000 == 0):
-		print counter , " # - comitting galaxies to database..."
+		print(counter , " # - comitting galaxies to database...")
 		session.commit()
 
 #--------------------------------------------------------------------------------

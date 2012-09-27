@@ -63,12 +63,12 @@ q = session.query(Association)
 q = q.filter(Association.dist < 0.0001)
 q = q.filter(func.abs(Association.vrel) < 50.0)
 
-for galaxy, bcg in [(a.galaxy, a.bcg) for a in q.all()]:
+for galaxy, bcg in [(a.galaxy, a.redmapper) for a in q.all()]:
 	bcg.sdss_galaxy = galaxy
-	bcg.objID = galaxy.objID
-	bcg.deVAB_r = galaxy.deVAB_r
-	bcg.deVABErr_r = galaxy.deVABErr_r
-	bcg.deVPhi_r = galaxy.deVPhi_r
-	bcg.lnLDeV_r = galaxy.lnLDeV_r
+	# bcg.objID = galaxy.objID
+	# bcg.deVAB_r = galaxy.deVAB_r
+	# bcg.deVABErr_r = galaxy.deVABErr_r
+	# bcg.deVPhi_r = galaxy.deVPhi_r
+	# bcg.lnLDeV_r = galaxy.lnLDeV_r
 
 session.commit()

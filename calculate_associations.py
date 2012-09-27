@@ -25,7 +25,7 @@ session = create_session()
 # Assign galaxies to clusters
 #--------------------------------------------------------------------------------
 from physics import calcSQLSumDist, calcSQLDist, calcVrel, calcAngularSeparation
-from classes import Bcg, Galaxy, Association
+from classes import Redmapper, SDSSGalaxy, Association
 import math
 from sqlalchemy import func
 
@@ -33,16 +33,16 @@ from sqlalchemy import func
 #queryGalaxyNotBcg = session.query(Galaxy).join(Bcg).filter(Galaxy.id != Bcg.sdss_galaxy_id).subquery('queryGalaxyNotBcg')
 
 counter = 0
-q = session.query(Galaxy, Bcg)
+q = session.query(SDSSGalaxy, Redmapper)
 
 # Do rough cut on position
-q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < 1.135)
+q = q.filter(calcSQLSumDist(SDSSGalaxy.ra, SDSSGalaxy.dec, Redmapper.ra, Redmapper.dec) < 1.135)
 
 # Do cut on relative velocity
-q = q.filter(func.abs(calcVrel(Bcg.z, Galaxy.z)) < maxVrel)
+q = q.filter(func.abs(calcVrel(Redmapper.z, SDSSGalaxy.z)) < maxVrel)
 
 # Do cut on projected separation
-q = q.filter(calcSQLDist(Bcg.ra, Bcg.dec, Galaxy.ra, Galaxy.dec) < func.asin( maxComovingDistance / Bcg.da ))
+q = q.filter(calcSQLDist(Redmapper.ra, Redmapper.dec, SDSSGalaxy.ra, SDSSGalaxy.dec) < func.asin( maxComovingDistance / Redmapper.da ))
 
 for galaxy, bcg in q.all():
 	# If the BCG-galaxy pair passes selection apertures then we add an association
@@ -52,9 +52,9 @@ for galaxy, bcg in q.all():
 	
 	association = Association(dist=dist, vrel=vrel)
 	association.galaxy = galaxy
-	from functions import calcPositionAngleEofNRelativeToCenterInDegrees
-	association.positionAngle = calcPositionAngleEofNRelativeToCenterInDegrees([galaxy.ra,galaxy.dec],[bcg.ra,bcg.dec])
-	bcg.associated_galaxies.append(association)
+	from functions import calcPositionAngleEofNRelativeToCenterInDegreesSpherical
+	association.positionAngle = calcPositionAngleEofNRelativeToCenterInDegreesSpherical([galaxy.ra,galaxy.dec],[bcg.ra,bcg.dec])
+	bcg.associated_sdss_galaxies.append(association)
 	
 	#print galaxy, " added to ", bcg
 	

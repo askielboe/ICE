@@ -71,11 +71,10 @@ def calcPositionAngleEofNRelativeToCenterInDegreesSpherical(vec,center):
 		if (vec[1] == center[1]):
 			return 0.0
 		
-		# Convert coordinates to radians and calculate relative to zenith
+		# Convert coordinates to radians and calculate relative to equator
 		a = (90.0 - vec[1]) * pi/180.
 		b = (90.0 - center[1]) * pi/180.
 		
-		# c is the angular separation
 		c = calcAngularSeparation(vec[0],vec[1],center[0],center[1])
 		
 		# Using spherical law of cosines to calculate the angle A
