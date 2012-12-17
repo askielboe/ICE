@@ -11,7 +11,7 @@
 
 from sqlalchemy import ForeignKey
 from sqlalchemy import Column, Integer, BigInteger, Float
-from sqlalchemy.orm import relationship #, backref
+from sqlalchemy.orm import relationship, deferred #, backref
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
@@ -36,14 +36,16 @@ class SDSSGalaxy(Base):
 	
 	# SDSS Quantities
 	objID         = Column(BigInteger, primary_key=True)	# SDSS Object ID
-	ra            = Column(Float)		# Right ascension
-	dec           = Column(Float)		# Declination
-	z             = Column(Float)		# Redshift
-	zErr          = Column(Float)		# Redshift Error
-	deVAB_r       = Column(Float)		# Axis Ratio (de Vaucouleurs fit)
-	deVABErr_r    = Column(Float)		# Axis Ratio Error (de Vaucouleurs fit)
-	deVPhi_r      = Column(Float)		# Position Angle (de Vaucouleurs fit)
-	lnLDeV_r      = Column(Float)		# de Vaucouleurs fit likelihood
+	ra            = deferred(Column(Float))		# Right ascension
+	dec           = deferred(Column(Float))		# Declination
+	z             = deferred(Column(Float))		# Redshift
+	zErr          = deferred(Column(Float))		# Redshift Error
+	deVAB_r       = deferred(Column(Float))		# Axis Ratio (de Vaucouleurs fit)
+	deVABErr_r    = deferred(Column(Float))		# Axis Ratio Error (de Vaucouleurs fit)
+	deVPhi_r      = deferred(Column(Float))		# Position Angle (de Vaucouleurs fit)
+	lnLDeV_r      = deferred(Column(Float))		# de Vaucouleurs fit likelihood
+	deVMag_u      = deferred(Column(Float))		# de Vaucouleurs fit u-band magnitude
+	deVMag_r      = deferred(Column(Float))		# de Vaucouleurs fit r-band magnitude
 	
 	# Derived quantities
 	da            = Column(Float)		# Angular Diameter Distance
@@ -84,45 +86,10 @@ class Redmapper(Base):
 	pBCG          = Column(Float)		# pBCG (redmapper: Rozo et. al. 2012)
 	lambda_chisq  = Column(Float)		# Richness
 	
-	# # SDSS Quantities
-	# objID         = Column(BigInteger)	# SDSS Object ID
-	# deVAB_r       = Column(Float)		# Axis Ratio (de Vaucouleurs fit)
-	# deVABErr_r    = Column(Float)		# Axis Ratio Error (de Vaucouleurs fit)
-	
-	# lnLDeV_r      = Column(Float)		# de Vaucouleurs fit likelihood
-	
 	# Derived quantities
 	da            = Column(Float)		# Angular Diameter Distance
 	
-	deVPhi_r      = Column(Float)		# Position Angle (de Vaucouleurs fit)
-	
-	#def _get_deVPhi_r(self):
-	#	return object_session(self).query(SDSSGalaxy.deVPhi_r).with_parent(self).all()
-	
-	#deVPhi_rProperty = property(_get_deVPhi_r)
-	
 	deVPhi_rProxy = association_proxy('sdss_galaxy', 'deVPhi_r')
-	
-	#from sqlalchemy.orm import column_property
-	#from sqlalchemy import select, and_
-	
-	# deVPhi_r_fromsdss = column_property(
-	# 	select(
-	# 		[SDSSGalaxy.deVPhi_r],
-	# 		and_(sdss_galaxy_id == SDSSGalaxy.objID),
-	# 	).correlate(None),
-	# 	deferred=True,
-	# )
-	
-	# deVPhi_r_fromsdss = column_property(
-	# 	select(
-	# 		[SDSSGalaxy.deVPhi_r],
-	# 		sdss_galaxy_id == SDSSGalaxy.objID)\
-	# 		.as_scalar() \
-	# 		.label('deVPhi_r_fromsdss'))
-	
-	
-	#deVPhi_r_fromsdss = column_property(select([SDSSGalaxy.deVPhi_r]).where(sdss_galaxy_id == SDSSGalaxy.objID).correlate(None), deferred=True)
 	
 	associated_sdss_galaxies = relationship("Association", backref='redmapper')
 	
@@ -136,4 +103,19 @@ class Redmapper(Base):
 	
 	def __repr__(self):
 		return "<Bcg('%f','%f','%f')>" % (self.ra, self.dec, self.z)
+
+class importClass(Base):
+	
+	__tablename__ = 'for_import'
+	
+	id = Column(BigInteger, primary_key=True)
+	
+	# SDSS Quantities
+	float1      = Column(Float)		# de Vaucouleurs fit u-band magnitude
+	float2      = Column(Float)		# de Vaucouleurs fit r-band magnitude
+	
+	def __init__(self, id, float1, float2):
+		self.id = id
+		self.float1 = float1
+		self.float2 = float2
 

@@ -19,8 +19,9 @@ engine = create_engine('mysql+mysqldb://root@127.0.0.1/ice')
 #--------------------------------------------------------------------------------
 # Import classes and create tables in databse
 #--------------------------------------------------------------------------------
-from classes import Redmapper, SDSSGalaxy
+from classes import Redmapper, SDSSGalaxy, importClass
 
 # Remember: For some databases a max length is required for parameters!
-Redmapper.metadata.create_all(engine)
-SDSSGalaxy.metadata.create_all(engine)
+# Redmapper.metadata.create_all(engine)
+# SDSSGalaxy.metadata.create_all(engine)
+importClass.metadata.create_all(engine)
