@@ -1,13 +1,13 @@
-# 
-# File:    match_objects.py 
-# 
+#
+# File:    match_objects.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Matches astronomical objects across tables
-# 
+#
 
 #--------------------------------------------------------------------------------
 # Settings
@@ -27,14 +27,14 @@ session = create_session()
 # from physics import calcSQLSumDist
 # from classes import Bcg, Galaxy
 # from sqlalchemy import func
-# 
+#
 # counter = 0
 # q = session.query(Bcg, Galaxy)
 # # Do rough cut on position
 # q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < maxSumDist)
 # # Do cut on redshift difference
 # q = q.filter(func.abs(Bcg.z - Galaxy.z) < maxZDiff)
-# 
+#
 # while (len(q.all()) > 1):
 # 	print "WARNING: Found several matches! Trying with tighter cuts.."
 # 	print "len(q.all()) = ", len(q.all())
@@ -45,13 +45,13 @@ session = create_session()
 # 	q = q.filter(calcSQLSumDist(Galaxy.ra, Galaxy.dec, Bcg.ra, Bcg.dec) < maxSumDist)
 # 	# Do cut on redshift difference
 # 	q = q.filter(func.abs(Bcg.z - Galaxy.z) < maxZDiff)
-# 
-# for bcg, galaxy in q.all():	
+#
+# for bcg, galaxy in q.all():
 # 	bcg.sdss_galaxy = galaxy
 # 	counter += 1
-# 
+#
 # session.commit()
-# 
+#
 # print "Total number of BCGs matched to SDSS galaxies = ", counter
 
 #--------------------------------------------------------------------------------

@@ -1,13 +1,13 @@
-# 
-# File:    create_database.py 
-# 
+#
+# File:    create_database.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Loads classes and creates tables in the database
-# 
+#
 
 #--------------------------------------------------------------------------------
 # Define database

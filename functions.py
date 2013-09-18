@@ -1,13 +1,13 @@
-# 
-# File:    functions.py 
-# 
+#
+# File:    functions.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     September 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Simple mathematical functions for speedy execution
-# 	
+#
 
 def vecSub(vec1,vec2):
 	# Subtracts two vectors
@@ -64,25 +64,25 @@ def calcPositionAngleEofNRelativeToCenterInDegreesSpherical(vec,center):
 	try:
 		if (vec == center):
 			return None
-		
+
 		if (vec[0] == center[0]):
 			return 90.0
-		
+
 		if (vec[1] == center[1]):
 			return 0.0
-		
+
 		# Convert coordinates to radians and calculate relative to equator
 		a = (90.0 - vec[1]) * pi/180.
 		b = (90.0 - center[1]) * pi/180.
-		
+
 		c = calcAngularSeparation(vec[0],vec[1],center[0],center[1])
-		
+
 		# Using spherical law of cosines to calculate the angle A
 		cosAngleA = ( cos(a) - cos(c)*cos(b) ) / ( sin(c)*sin(b) )
-		
+
 		angleA = acos(cosAngleA)
 		positionAngle = angleA * 180./pi
-		
+
 		return positionAngle
 	except ValueError:
 		print "ERROR in calcPositionAngleEofNRelativeToCenterInDegrees: Type error!"

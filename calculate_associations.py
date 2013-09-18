@@ -1,13 +1,13 @@
-# 
-# File:    calculate_associations.py 
-# 
+#
+# File:    calculate_associations.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Assigns galaxies to clusters using SQL joins
-# 
+#
 
 #--------------------------------------------------------------------------------
 # Settings
@@ -49,15 +49,15 @@ for galaxy, bcg in q.all():
 	vrel = calcVrel(bcg.z, galaxy.z)
 	sep = calcAngularSeparation(bcg.ra, bcg.dec, galaxy.ra, galaxy.dec)
 	dist = math.tan(sep) * bcg.da
-	
+
 	association = Association(dist=dist, vrel=vrel)
 	association.galaxy = galaxy
 	from functions import calcPositionAngleEofNRelativeToCenterInDegreesSpherical
 	association.positionAngle = calcPositionAngleEofNRelativeToCenterInDegreesSpherical([galaxy.ra,galaxy.dec],[bcg.ra,bcg.dec])
 	bcg.associated_sdss_galaxies.append(association)
-	
+
 	#print galaxy, " added to ", bcg
-	
+
 	counter += 1
 	if (counter % 1000 == 0):
 		print counter , " # - assigning galaxies to clusters..."

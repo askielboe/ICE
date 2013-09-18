@@ -1,16 +1,16 @@
-# 
-# File:    create_database.py 
-# 
+#
+# File:    create_database.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Routines for matching obejcts for adding information from various catalogs
-# 	
+#
 
 # from classes import *
-# 
+#
 # def is_same_object():
 # 	# Add photometric de Vaucouleurs fit information (r band only)
 # 	for objID, ra, dec, z, zErr, deVAB_r, deVABErr_r, deVPhi_r, lnLDeV_r in dataSDSSGalaxies:

@@ -1,13 +1,13 @@
-# 
-# File:    calculate_derived_quantities.py 
-# 
+#
+# File:    calculate_derived_quantities.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Calculates physically derived quantities. Often requires to assume a given cosmology.
-# 
+#
 
 #--------------------------------------------------------------------------------
 # Create a session
@@ -29,7 +29,7 @@ from physics import cosmocalc_angular_diameter_distance
 # 	if (counter % 1000 == 0):
 # 		print counter , " # - calculating derived quantities..."
 # 		session.commit()
-# 	
+#
 # session.commit()
 
 # ===== Da for Redmapper =====

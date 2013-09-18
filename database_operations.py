@@ -1,13 +1,13 @@
-# 
-# File:    database_operations.py 
-# 
+#
+# File:    database_operations.py
+#
 # Author1:  Andreas Skielboe (skielboe@dark-cosmology.dk)
 # Date:     August 2012
-# 
-# Summary of File: 
-# 
+#
+# Summary of File:
+#
 #   Functions that connect to and modify the database at the lowest levels in SQLalchemy
-# 
+#
 
 def create_session():
 	#--------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ def create_session():
 	from sqlalchemy import create_engine
 	import MySQLdb as mysqldb
 	engine = create_engine('mysql+mysqldb://root@127.0.0.1/ice')
-	
+
 	#--------------------------------------------------------------------------------
 	# Create a session to start talking to the database
 	#--------------------------------------------------------------------------------
