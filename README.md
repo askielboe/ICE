@@ -11,3 +11,4 @@ Order of execution:
 * calculate_derived_quantities.py
 * calculate_associations.py
 * match_objects.py
+* calculate_cluster_member_properties.py
