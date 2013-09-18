@@ -121,50 +121,7 @@
 # cb = plt.colorbar()
 # cb.set_label('counts')
 
-# # ======== Galaxy position angles relative to BCG vs galaxy intrinsic position angle relative to BCG ========
-# from database_operations import create_session
-# session = create_session()
-#
-# from classes import Association, SDSSGalaxy, Redmapper
-# from sqlalchemy import func
-#
-# ### Mikes method
-# from sqlalchemy.orm import aliased
-# redmapper_sdssgalaxy_aliased = aliased(SDSSGalaxy)
-# q = session.query(Association.angleToBCGMajorAxis, func.abs(redmapper_sdssgalaxy_aliased.deVPhi_r - SDSSGalaxy.deVPhi_r))
-# q = q.join(Association.redmapper)
-# q = q.join(Association.galaxy).join(redmapper_sdssgalaxy_aliased, Redmapper.sdss_galaxy)
-#
-# # Filter: Angle to major axis is non-negative
-# q = q.filter(Association.angleToBCGMajorAxis != None)
-# q = q.filter(Association.angleToBCGMajorAxis >= 0.)
-#
-# # Filter: Position angles are non-negative
-# q = q.filter(redmapper_sdssgalaxy_aliased.deVPhi_r >= 0.)
-# q = q.filter(SDSSGalaxy.deVPhi_r >= 0.)
-#
-# #q = q.filter(Redmapper.lambda_chisq > 20.0)
-# q = q.filter(Association.dist < 1.0)
-# q = q.filter(func.abs(Association.vrel) < 1000.0)
-#
-# x = [angleToBCGMajorAxis for angleToBCGMajorAxis,angleDifference in q.all()]
-# y = [angleDifference for angleToBCGMajorAxis,angleDifference in q.all()]
-#
-# # ==== Plotting ====
-# import matplotlib.pyplot as plt
-# from numpy import histogram2d
-# from pylab import imshow, colorbar
-#
-# # ==== Using histogram2d ====
-# hist,xedges,yedges = histogram2d(x,y,bins=20,range=[[0.,90.],[0.,90.]])
-# extent = [xedges[0], xedges[-1], yedges[0], yedges[-1] ]
-# imshow(hist.T,extent=extent,interpolation='nearest',origin='lower')
-# colorbar()
-# plt.xlabel("angle to CG major axis")
-# plt.ylabel("difference in position angle")
-# plt.show()
-
-# ======== Galaxy position angles relative to BCG vs U - R color difference ========
+# ======== Galaxy position angles relative to BCG vs galaxy intrinsic position angle relative to BCG ========
 from database_operations import create_session
 session = create_session()
 
@@ -172,73 +129,116 @@ from classes import Association, SDSSGalaxy, Redmapper
 from sqlalchemy import func
 
 ### Mikes method
-#from sqlalchemy.orm import aliased
-#centralGalaxy = aliased(SDSSGalaxy)
-q = session.query(Association.angleToBCGMajorAxis, SDSSGalaxy.deVMag_u - SDSSGalaxy.deVMag_r)
-q = q.join(Association.redmapper).join(Association.galaxy)
-#q = q.join(centralGalaxy, Redmapper.sdss_galaxy)
+from sqlalchemy.orm import aliased
+redmapper_sdssgalaxy_aliased = aliased(SDSSGalaxy)
+q = session.query(Association.angleToBCGMajorAxis, func.abs(redmapper_sdssgalaxy_aliased.deVPhi_r - SDSSGalaxy.deVPhi_r))
+q = q.join(Association.redmapper)
+q = q.join(Association.galaxy).join(redmapper_sdssgalaxy_aliased, Redmapper.sdss_galaxy)
 
 # Filter: Angle to major axis is non-negative
 q = q.filter(Association.angleToBCGMajorAxis != None)
 q = q.filter(Association.angleToBCGMajorAxis >= 0.)
 
-q = q.filter(SDSSGalaxy.deVMag_u >= 0.)
-q = q.filter(SDSSGalaxy.deVMag_r >= 0.)
+# Filter: Position angles are non-negative
+q = q.filter(redmapper_sdssgalaxy_aliased.deVPhi_r >= 0.)
+q = q.filter(SDSSGalaxy.deVPhi_r >= 0.)
 
-q = q.filter((SDSSGalaxy.deVMag_u - SDSSGalaxy.deVMag_r) < 30.0)
-
-# Make cuts based on size of cluster
-from scaling_relations import *
-M200m = getM200mFromRichness(Redmapper.lambda_chisq)
-q = q.filter(Redmapper.lambda_chisq > 20.0)
-
-q = q.filter(Association.dist < 3.0)
+#q = q.filter(Redmapper.lambda_chisq > 20.0)
+q = q.filter(Association.dist < 1.0)
 q = q.filter(func.abs(Association.vrel) < 1000.0)
 
-q = q.filter(SDSSGalaxy.z < 0.5)
-
-x = [angleToBCGMajorAxis for angleToBCGMajorAxis,colorDifference in q.all()]
-y = [colorDifference for angleToBCGMajorAxis,colorDifference in q.all()]
+x = [angleToBCGMajorAxis for angleToBCGMajorAxis,angleDifference in q.all()]
+y = [angleDifference for angleToBCGMajorAxis,angleDifference in q.all()]
 
 # ==== Plotting ====
 import matplotlib.pyplot as plt
 from numpy import histogram2d
-from pylab import figure, imshow, colorbar
+from pylab import imshow, colorbar
+
+# ==== Using histogram2d ====
+hist,xedges,yedges = histogram2d(x,y,bins=20,range=[[0.,90.],[0.,90.]])
+extent = [xedges[0], xedges[-1], yedges[0], yedges[-1] ]
+imshow(hist.T,extent=extent,interpolation='nearest',origin='lower')
+colorbar()
+plt.xlabel("angle to CG major axis")
+plt.ylabel("difference in position angle")
+plt.show()
+
+# # ======== Galaxy position angles relative to BCG vs U - R color difference ========
+# from database_operations import create_session
+# session = create_session()
+
+# from classes import Association, SDSSGalaxy, Redmapper
+# from sqlalchemy import func
+
+# ### Mikes method
+# from sqlalchemy.orm import aliased
+# centralGalaxy = aliased(SDSSGalaxy)
+# q = session.query(Association.angleToBCGMajorAxis, SDSSGalaxy.deVMag_u - SDSSGalaxy.deVMag_r)
+# q = q.join(Association.redmapper).join(Association.galaxy)
+# q = q.join(centralGalaxy, Redmapper.sdss_galaxy)
+
+# # Filter: Angle to major axis is non-negative
+# q = q.filter(Association.angleToBCGMajorAxis != None)
+# q = q.filter(Association.angleToBCGMajorAxis >= 0.)
+
+# q = q.filter(SDSSGalaxy.deVMag_u >= 0.)
+# q = q.filter(SDSSGalaxy.deVMag_r >= 0.)
+
+# q = q.filter((SDSSGalaxy.deVMag_u - SDSSGalaxy.deVMag_r) < 30.0)
+
+# # Make cuts based on size of cluster
+# #from scaling_relations import *
+# #M200m = getM200mFromRichness(Redmapper.lambda_chisq)
+# q = q.filter(Redmapper.lambda_chisq > 20.0)
+
+# q = q.filter(Association.dist < 3.0)
+# q = q.filter(func.abs(Association.vrel) < 1000.0)
+
+# q = q.filter(SDSSGalaxy.z < 0.5)
+
+# x = [angleToBCGMajorAxis for angleToBCGMajorAxis,colorDifference in q.all()]
+# y = [colorDifference for angleToBCGMajorAxis,colorDifference in q.all()]
+
+# # ==== Plotting ====
+# import matplotlib.pyplot as plt
+# from numpy import histogram2d
+# from pylab import figure, imshow, colorbar
 
 
-# # ==== Using histogram2d ====
-# hist,xedges,yedges = histogram2d(x,y,bins=15,range=[[0.,90.],[0.,5.]])
-# extent = [xedges[0], xedges[-1], yedges[0], yedges[-1] ]
-# imshow(hist.T,extent=extent,interpolation='nearest',origin='lower')
-# colorbar()
+# # # ==== Using histogram2d ====
+# # hist,xedges,yedges = histogram2d(x,y,bins=15,range=[[0.,90.],[0.,5.]])
+# # extent = [xedges[0], xedges[-1], yedges[0], yedges[-1] ]
+# # imshow(hist.T,extent=extent,interpolation='nearest',origin='lower')
+# # colorbar()
+# # plt.xlabel("angle to CG major axis")
+# # plt.ylabel("color difference (U-R)")
+# # plt.show()
+
+# # ==== Using pcolorfast ====
+# hist,xedges,yedges = histogram2d(x,y,bins=20,range=[[0.,90.],[0.,5.]])
+# fig = figure()
+# ax = fig.add_subplot(111)
+# im = ax.pcolorfast(xedges,yedges,hist.T)
+# fig.colorbar(im)
 # plt.xlabel("angle to CG major axis")
 # plt.ylabel("color difference (U-R)")
 # plt.show()
 
-# ==== Using pcolorfast ====
-hist,xedges,yedges = histogram2d(x,y,bins=20,range=[[0.,90.],[0.,5.]])
-fig = figure()
-ax = fig.add_subplot(111)
-im = ax.pcolorfast(xedges,yedges,hist.T)
-fig.colorbar(im)
-plt.xlabel("angle to CG major axis")
-plt.ylabel("color difference (U-R)")
-plt.show()
-
-# # ==== Using hexbin ====
-# import matplotlib.cm as cm
-#
-# xmin = min(x)
-# xmax = max(x)
-# ymin = min(y)
-# ymax = max(y)
-#
-# plt.subplot(111)
-# plt.hexbin(x,y, cmap=cm.jet)
-# plt.axis([xmin, xmax, ymin, ymax])
-# plt.title("Hexagon binning")
-# plt.xlabel("angle to CG major axis")
-# plt.ylabel("difference in position angle")
-# cb = plt.colorbar()
-# cb.set_label('counts')
-# plt.show()
+# # # ==== Using hexbin ====
+# # import matplotlib.cm as cm
+# #
+# # xmin = min(x)
+# # xmax = max(x)
+# # ymin = min(y)
+# # ymax = max(y)
+# #
+# # plt.subplot(111)
+# # plt.hexbin(x,y, cmap=cm.jet)
+# # plt.axis([xmin, xmax, ymin, ymax])
+# # plt.title("Hexagon binning")
+# # plt.xlabel("angle to CG major axis")
+# # plt.ylabel("difference in position angle")
+# # cb = plt.colorbar()
+# # cb.set_label('counts')
+# # plt.show()
